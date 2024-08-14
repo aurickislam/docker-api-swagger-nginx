@@ -1,0 +1,14 @@
+services:
+  swagger-ui-nginx:
+#    image: nginx:1
+    image: nginx:1-alpine
+    container_name: swagger-ui-nginx
+    hostname: swagger-ui-nginx
+    ports:
+      - '8087:80'
+    volumes:
+      - ./swagger-ui:/swagger-ui
+      - ./nginx/templates/swagger-ui.conf.template:/etc/nginx/templates/default.conf.template
+    environment:
+      - DOCKER_SERVER_URL=http://192.168.68.107:2375
+      - DOCKER_API_BASE_PATH=/v1.46/
