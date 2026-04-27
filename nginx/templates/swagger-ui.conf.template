@@ -3,21 +3,48 @@ server {
     server_name localhost;
     root /swagger-ui;
 
-    add_header X-Frame-Options "SAMEORIGIN";
-    add_header X-Content-Type-Options "nosniff";
+    index index.html;
+    charset utf-8;
+    server_tokens off;
 
-    # enable gzip
+    add_header X-Frame-Options "SAMEORIGIN" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header Referrer-Policy "no-referrer-when-downgrade" always;
+
     gzip on;
-    gzip_comp_level 9;
+    gzip_static on;
+    gzip_vary on;
+    gzip_comp_level 6;
     gzip_min_length 1000;
-    gzip_proxied expired no-cache no-store private auth;
-    gzip_types text/plain text/css text/xml text/javascript application/javascript application/x-javascript application/xml application/xml+rss application/json application/octet-stream;
+    gzip_proxied any;
+    gzip_disable "msie6";
+    gzip_types text/plain text/css text/xml text/yaml text/javascript application/javascript application/x-javascript application/xml application/xml+rss application/json;
 
     location $DOCKER_API_BASE_PATH {
         proxy_pass $DOCKER_SERVER_URL;
+        proxy_http_version 1.1;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_connect_timeout 10s;
+        proxy_read_timeout 60s;
     }
 
+    location ~* \.ya?ml$ {
+        types { }
+        default_type text/yaml;
+    }
+
+    location ~* \.(js|css|png|ico|woff2?)$ {
+        expires 1d;
+        add_header Cache-Control "public, immutable";
+        access_log off;
+    }
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location = /robots.txt  { access_log off; log_not_found off; }
+
     location / {
-        try_files $uri  /index.html;
+        try_files $uri /index.html;
     }
 }
