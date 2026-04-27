@@ -1,4 +1,14 @@
 services:
+  docker-api:
+    image: alpine/socat
+    container_name: docker-api-tcp
+    ports:
+      - "2375:2375"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: TCP-LISTEN:2375,reuseaddr,fork UNIX-CONNECT:/var/run/docker.sock
+    restart: unless-stopped
+
   swagger-ui-nginx:
 #    image: nginx:1
     image: nginx:1-alpine
@@ -10,5 +20,8 @@ services:
       - ./swagger-ui:/swagger-ui
       - ./nginx/templates/swagger-ui.conf.template:/etc/nginx/templates/default.conf.template
     environment:
-      - DOCKER_SERVER_URL=http://192.168.68.107:2375
-      - DOCKER_API_BASE_PATH=/v1.46/
+#      - DOCKER_SERVER_URL=http://192.168.88.78:2375
+      - DOCKER_SERVER_URL=http://docker-api:2375
+      - DOCKER_API_BASE_PATH=/v1.54/
+    depends_on:
+      - docker-api
