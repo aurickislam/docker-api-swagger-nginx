@@ -23,5 +23,6 @@ services:
 #      - DOCKER_SERVER_URL=http://192.168.88.78:2375
       - DOCKER_SERVER_URL=http://docker-api:2375
       - DOCKER_API_BASE_PATH=/v1.54/
+    command: sh -c "find /swagger-ui -size +1k | grep -E '[.](yaml|yml|js|css|html)$$' | xargs gzip -k -f -6 && /docker-entrypoint.sh nginx -g 'daemon off;'"
     depends_on:
       - docker-api
