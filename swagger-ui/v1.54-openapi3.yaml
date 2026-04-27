@@ -1,7 +1,6 @@
 openapi: 3.0.1
 servers:
   - url: /v1.54
-    description: "Macbook M1 pro"
   - url: "http://192.168.88.17:2375/v1.54"
     description: "Brix"
 info:
